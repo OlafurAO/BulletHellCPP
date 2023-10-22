@@ -1,7 +1,11 @@
 #pragma once
 
+#include <sdl2/SDL.h>
+
 #include <Enums.h>
 #include <GameObject.h>
+#include <Item.h>
+#include <Weapon.h>
 
 class Character : public GameObject {
 public:
@@ -12,6 +16,12 @@ public:
   void update();
   void attack();
 
+  void equipWeapon(Weapon* weapon);
+
+  GameObject* getEquippedWeapon();
+
+  int getHealth();
+
   bool isAttacking();
 
 private:
@@ -19,6 +29,11 @@ private:
   void updateAnimation();
 
   void checkAttackAnimation();
+
+  Weapon* _equippedWeapon = nullptr;
+
+  int _health = 10;
+  int _damage = 1;
 
   CharacterDirection _characterDirection = CharacterDirection::RIGHT;
   bool _isAttacking = false;

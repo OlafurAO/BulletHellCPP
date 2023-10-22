@@ -10,8 +10,8 @@ void ResourceManager::cleanUpResources() {
   }
 }
 
-Texture2D ResourceManager::loadTexture(SDL_Renderer* renderer, const char* texFile, std::string texKey, TextureType texType, int spriteRows,
-                                       int spriteCols) {
+Texture2D& ResourceManager::loadTexture(SDL_Renderer* renderer, const char* texFile, std::string texKey, TextureType texType,
+                                        int spriteRows, int spriteCols) {
   _textures[texKey] = loadTextureFromFile(renderer, texFile, texType, spriteRows, spriteCols);
   return _textures[texKey];
 }

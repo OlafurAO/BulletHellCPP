@@ -17,8 +17,8 @@ public:
 
   static void cleanUpResources();
 
-  static Texture2D loadTexture(SDL_Renderer* renderer, const char* texFile, std::string texKey, TextureType texType, int spriteRows = 0,
-                               int spriteCols = 0);
+  static Texture2D& loadTexture(SDL_Renderer* renderer, const char* texFile, std::string texKey, TextureType texType, int spriteRows = 0,
+                                int spriteCols = 0);
   static Texture2D& getTexture(std::string texName);
 
 private:

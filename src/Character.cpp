@@ -1,3 +1,4 @@
+#include <Character.h>
 #include <headers/Character.h>
 
 void Character::update() {
@@ -8,6 +9,11 @@ void Character::update() {
   if (!_isAttacking) {
     updateDirection();
     updateAnimation();
+
+    if (_equippedWeapon != nullptr) {
+      _equippedWeapon->setDirection(_characterDirection == CharacterDirection::RIGHT ? 1 : -1);
+      _equippedWeapon->setPosition(_position - glm::vec3(10.f, -20.f, 0.f) + ((g_baseSpriteSize * _scale.x) / 2));
+    }
   } else {
     checkAttackAnimation();
   }
@@ -19,39 +25,23 @@ void Character::update() {
 void Character::updateDirection() {
   if (_movementVector != glm::vec3(0.f)) {
     _isMoving = true;
-    if (_movementVector.x == 0) {
-      // clang-format off
-      _characterDirection = 
-        (_movementVector.y > 0) ? CharacterDirection::DOWN
-          : (_movementVector.y < 0 && _direction < 0) ? CharacterDirection::LEFT
-            : (_movementVector.y < 0) ? CharacterDirection::RIGHT
-          : _characterDirection;
-      // clang-format on      
-    } else {
-      _characterDirection = CharacterDirection::UP;
+    if (_movementVector.x > 0) {
+      _characterDirection = CharacterDirection::RIGHT;
+    } else if (_movementVector.x < 0) {
+      _characterDirection = CharacterDirection::LEFT;
     }
   } else {
     _isMoving = false;
   }
 }
 
-void Character::updateAnimation() {    
+void Character::updateAnimation() {
   AnimationType animationType;
-  // clang-format off
-  if (_isMoving) {    
-    animationType =
-      _characterDirection == CharacterDirection::DOWN ? AnimationType::WALK1
-      : _characterDirection == CharacterDirection::LEFT
-        || _characterDirection == CharacterDirection::RIGHT ? AnimationType::WALK3
-      : AnimationType::WALK2;
+  if (_isMoving) {
+    animationType = AnimationType::WALK1;
   } else {
-    animationType =
-      _characterDirection == CharacterDirection::DOWN ? AnimationType::IDLE1
-      : _characterDirection == CharacterDirection::LEFT
-        || _characterDirection == CharacterDirection::RIGHT ? AnimationType::IDLE3
-      : AnimationType::IDLE2; 
+    animationType = AnimationType::IDLE1;
   }
-  // clang-format on
   _animator->playAnimation(animationType);
 }
 
@@ -69,15 +59,13 @@ void Character::attack() {
 
   setCanMove(false);
   _isAttacking = true;
-
-  // clang-format off
-  AnimationType attackAnimation = 
-    _characterDirection == CharacterDirection::DOWN ? AnimationType::ATTACK1
-    : _characterDirection == CharacterDirection::LEFT
-      || _characterDirection == CharacterDirection::RIGHT ? AnimationType::ATTACK3
-    : AnimationType::ATTACK2;
-  // clang-format on
-  _animator->playAnimation(attackAnimation);
+  _animator->playAnimation(AnimationType::ATTACK1);
 }
+
+void Character::equipWeapon(Weapon* weapon) { _equippedWeapon = weapon; }
+
+GameObject* Character::getEquippedWeapon() { return _equippedWeapon; }
+
+int Character::getHealth() { return _health; }
 
 bool Character::isAttacking() { return _isAttacking; }

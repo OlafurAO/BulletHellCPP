@@ -6,6 +6,8 @@
 
 #include <Animator.h>
 #include <Enums.h>
+#include <Hitbox.h>
+#include <Texture2D.h>
 
 class GameObject {
 public:
@@ -20,19 +22,19 @@ public:
 
   virtual void setMovementVectorX(int direction);
   virtual void setMovementVectorY(int direction);
-  virtual void registerTextureKey(const char* texKey);
+  virtual void registerTexture(const char* texKey, Texture2D& tex, SDL_Renderer* renderer, unsigned int referenceFrameIndex);
   virtual void registerAnimation(AnimationType type, int* spriteIndices, unsigned int frameCount, bool loop);
   virtual void playAnimation(AnimationType type);
+  virtual void setPosition(glm::vec3 newPos);
 
-  virtual SDL_Rect getPositionRect();
+  virtual SDL_FRect getHitboxDimensions();
+  virtual SDL_FRect getPositionRect();
   virtual glm::vec3 getPositionVec();
 
   virtual int getDirection();
 
   virtual const char* getTextureKey();
   virtual unsigned int getSpriteIndex();
-
-  virtual int getHealth();
 
   GameObjectType getObjectType();
 
@@ -48,22 +50,28 @@ protected:
 
   int _direction = 1;
 
+  double _zRotation = 0.f;
+
   bool _canMove;
 
 private:
   void init(GameObjectType objectType);
   void initScale(float scale);
   void initSpeed(float speed);
+  void initHitbox(SDL_Renderer* renderer, Texture2D& tex, unsigned int referenceFrameIndex);
+
+  void updateHitboxPos(glm::vec3 newPos);
 
   void updateMovement(double deltaTime);
   void updatePrevMovementVector();
-  void updateRotationOnMoveX(int direction);
-
-  const char* _textureKey;
+  void updateDirectionOnMoveX(int direction);
 
   GameObjectType _objectType;
 
+  Hitbox* _hitbox;
+
+  const char* _textureKey;
+  std::pair<int, int> _texFrameSize;
+
   float _speed = 1.f;
-  int _health = 10;
-  int _damage = 1;
 };

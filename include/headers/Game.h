@@ -1,5 +1,5 @@
 #pragma once
-#pragma once
+
 #include <chrono>
 #include <iostream>
 #include <memory>
@@ -7,11 +7,14 @@
 
 #include <sdl2/SDL.h>
 
+#include <Character.h>
 #include <Enemy.h>
 #include <Enums.h>
 #include <EventManager.h>
 #include <GameObject.h>
+#include <Item.h>
 #include <Player.h>
+#include <Texture2D.h>
 #include <WindowManager.h>
 
 class Game {
@@ -32,7 +35,10 @@ private:
   EventManager* _eventManager;
   Player* _player;
 
-  std::vector<GameObject*> _gameObjects;
+  std::vector<Character*> _characters;
+  std::vector<Item*> _items;
 
   GameState _gameState;
+
+  bool _debug = true;
 };
