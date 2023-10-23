@@ -19,9 +19,14 @@ public:
   // clang-format on
 
   void update(Player* player, float deltaTime);
-  void updatePlayerChase(Player* player, float deltaTime);
 
 private:
+  void checkPlayerCollision(Player* player);
+  void updateChaseCooldown(float deltaTime);
+  void updatePlayerChase(Player* player, float deltaTime);
+
+  void resetChaseCooldown();
+
   const float _MAX_CHASE_TIME;
   const float _CHASE_COOLDOWN_TIME;
   float _currentChaseTime = 0.f;

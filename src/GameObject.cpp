@@ -62,12 +62,14 @@ void GameObject::initHitbox(SDL_Renderer* renderer, Texture2D& tex, unsigned int
       }
     }
 
-    float multiplier = (g_baseSpriteSize * _scale.x) / _texFrameSize.first;
+    float multiplier = (g_BASE_SPRITE_SIZE * _scale.x) / _texFrameSize.first;
     SDL_FRect hitboxRect = {left * multiplier, top * multiplier, (right - left + 1) * multiplier, (bottom - top + 1) * multiplier};
     _hitbox = new Hitbox(_position, hitboxRect);
 
     SDL_UnlockSurface(spriteSurface);
   }
+
+  tex.destroyTextureSurface();
 }
 
 void GameObject::updateHitboxPos(glm::vec3 newPos) { _hitbox->updatePosition(newPos); }
@@ -133,15 +135,19 @@ void GameObject::setPosition(glm::vec3 newPos) {
   updateHitboxPos(newPos);
 }
 
-SDL_FRect GameObject::getHitboxDimensions() { return _hitbox->getDimensions(); }
+Hitbox* GameObject::getHitbox() { return _hitbox; }
+
+SDL_FRect GameObject::getHitboxBounds() { return _hitbox->getHitboxBounds(); }
+
+SDL_Color GameObject::getColor() { return _color; }
 
 SDL_FRect GameObject::getPositionRect() {
   // clang-format off
   SDL_FRect rect = {
     _position.x,
     _position.y,
-    g_baseSpriteSize * _scale.x,
-    g_baseSpriteSize * _scale.y,
+    g_BASE_SPRITE_SIZE * _scale.x,
+    g_BASE_SPRITE_SIZE * _scale.y,
   };
   // clang-format on
 

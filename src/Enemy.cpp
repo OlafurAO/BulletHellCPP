@@ -1,8 +1,22 @@
-#include <headers/Enemy.h>
+#include <Enemy.h>
 
-void Enemy::update(Player* player, float deltaTime) { updatePlayerChase(player, deltaTime); }
+void Enemy::update(Player* player, float deltaTime) {
+  checkPlayerCollision(player);
+  updateChaseCooldown(deltaTime);
+  updatePlayerChase(player, deltaTime);
+}
 
-void Enemy::updatePlayerChase(Player* player, float deltaTime) {
+void Enemy::checkPlayerCollision(Player* player) {
+  // TODO: Ignore if enemy attack method involves it avoiding the player
+  // TODO: Ignore it enemy is outside of a certain range
+
+  if (!player->isTakingDamage() && isColliding(player->getHitbox())) {
+    player->takeDamage(_damage);
+    resetChaseCooldown();
+  }
+}
+
+void Enemy::updateChaseCooldown(float deltaTime) {
   if (_isCoolingDownChase) {
     _currentCooldownTime += deltaTime;
     if (_currentCooldownTime >= _CHASE_COOLDOWN_TIME) {
@@ -13,12 +27,12 @@ void Enemy::updatePlayerChase(Player* player, float deltaTime) {
   } else {
     _currentChaseTime += deltaTime;
     if (_currentChaseTime >= _MAX_CHASE_TIME) {
-      _isCoolingDownChase = true;
-      _currentChaseTime = 0.f;
-      _canMove = false;
+      resetChaseCooldown();
     }
   }
+}
 
+void Enemy::updatePlayerChase(Player* player, float deltaTime) {
   if (!_canMove)
     return;
 
@@ -39,4 +53,10 @@ void Enemy::updatePlayerChase(Player* player, float deltaTime) {
   } else {
     setMovementVectorY(0);
   }
+}
+
+void Enemy::resetChaseCooldown() {
+  _isCoolingDownChase = true;
+  _currentChaseTime = 0.f;
+  _canMove = false;
 }

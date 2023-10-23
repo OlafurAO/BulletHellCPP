@@ -26,6 +26,8 @@ void Texture2D::generateSpriteSheet(int rows, int cols) {
 
 void Texture2D::cleanUp() { SDL_DestroyTexture(_texture); }
 
+void Texture2D::destroyTextureSurface() { SDL_FreeSurface(_textureSurface); }
+
 SDL_Texture* Texture2D::getTexture() { return _texture; }
 
 SDL_Surface* Texture2D::getTextureSurface() { return _textureSurface; }

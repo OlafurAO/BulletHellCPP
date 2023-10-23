@@ -27,7 +27,10 @@ public:
   virtual void playAnimation(AnimationType type);
   virtual void setPosition(glm::vec3 newPos);
 
-  virtual SDL_FRect getHitboxDimensions();
+  virtual Hitbox* getHitbox();
+  virtual SDL_FRect getHitboxBounds();
+  virtual SDL_Color getColor();
+
   virtual SDL_FRect getPositionRect();
   virtual glm::vec3 getPositionVec();
 
@@ -42,6 +45,9 @@ protected:
   void setCanMove(bool canMove);
 
   Animator* _animator;
+  Hitbox* _hitbox;
+
+  SDL_Color _color = g_DEFAULT_COLOR;
 
   glm::vec3 _position;
   glm::vec3 _movementVector;
@@ -67,8 +73,6 @@ private:
   void updateDirectionOnMoveX(int direction);
 
   GameObjectType _objectType;
-
-  Hitbox* _hitbox;
 
   const char* _textureKey;
   std::pair<int, int> _texFrameSize;

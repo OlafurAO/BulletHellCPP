@@ -8,11 +8,9 @@ Animator::Animator() {
 
 Animator::~Animator() { _animations.clear(); }
 
-#include <iostream>
-
 void Animator::update(double deltaTime) {
   _animationTimer += deltaTime;
-  if (_animationTimer >= g_animationTickRate) {
+  if (_animationTimer >= g_ANIMATION_TICK_RATE) {
     nextFrame();
   }
 }

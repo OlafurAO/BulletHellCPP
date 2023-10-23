@@ -24,7 +24,9 @@ public:
 
   void renderGameObjects(std::vector<Character*> characters, std::vector<Item*> items);
   void renderDebugProps(std::vector<Joystick*> joysticks);
-  void drawGameObject(GameObject* obj);
+  void renderTexture(SDL_Texture* texture, SDL_Rect srcRect, SDL_FRect destRect, int direction);
+
+  void drawGameObject(GameObject* obj, SDL_Color color = {255, 255, 255});
 
   void cleanUp();
 

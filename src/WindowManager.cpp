@@ -1,5 +1,11 @@
 #include <WindowManager.h>
 
+bool operator==(const SDL_Color& color1, const SDL_Color& color2) {
+  return (color1.r == color2.r) && (color1.g == color2.g) && (color1.b == color2.b);
+}
+
+bool operator!=(const SDL_Color& color1, const SDL_Color& color2) { return !(color1 == color2); }
+
 WindowManager::WindowManager() {
   _window = nullptr;
   _resourceManager = new ResourceManager();
@@ -34,6 +40,10 @@ void WindowManager::renderGameObjects(std::vector<Character*> characters, std::v
   }
 }
 
+void WindowManager::renderTexture(SDL_Texture* texture, SDL_Rect srcRect, SDL_FRect destRect, int direction) {
+  SDL_RenderCopyExF(_renderer, texture, &srcRect, &destRect, 0.f, nullptr, direction > 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+}
+
 void WindowManager::renderDebugProps(std::vector<Joystick*> joysticks) {
   for (const auto& joystick : joysticks) {
     Texture2D& joystickTexture = _resourceManager->getTexture(joystick->getTextureKey());
@@ -43,15 +53,25 @@ void WindowManager::renderDebugProps(std::vector<Joystick*> joysticks) {
   }
 }
 
-void WindowManager::drawGameObject(GameObject* obj) {
+void WindowManager::drawGameObject(GameObject* obj, SDL_Color color) {
   Texture2D& objTexture = _resourceManager->getTexture(obj->getTextureKey());
   SDL_Rect spriteFrame = objTexture.getSpriteFrame(obj->getSpriteIndex());
   SDL_FRect objPos = obj->getPositionRect();
 
-  SDL_RenderCopyExF(_renderer, objTexture.getTexture(), &spriteFrame, &objPos, 0.f, nullptr,
-                    obj->getDirection() > 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+  SDL_Texture* tex = objTexture.getTexture();
+  SDL_Color objColor = obj->getColor();
+  bool setColor = objColor != g_DEFAULT_COLOR;
 
-  SDL_FRect hitbox = obj->getHitboxDimensions();
+  if (setColor)
+    SDL_SetTextureColorMod(tex, objColor.r, objColor.g, objColor.b);
+
+  renderTexture(tex, spriteFrame, objPos, obj->getDirection());
+
+  if (setColor)
+    SDL_SetTextureColorMod(tex, g_DEFAULT_COLOR.r, g_DEFAULT_COLOR.g, g_DEFAULT_COLOR.b);
+
+  // Debug
+  SDL_FRect hitbox = obj->getHitboxBounds();
   SDL_SetRenderDrawColor(_renderer, 0, 255, 0, 255);
   SDL_RenderDrawRectF(_renderer, &hitbox);
 }

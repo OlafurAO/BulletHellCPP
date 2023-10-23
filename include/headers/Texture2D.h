@@ -16,6 +16,7 @@ public:
   void generateSpriteSheet(int rows, int cols);
 
   void cleanUp();
+  void destroyTextureSurface();
 
   SDL_Texture* getTexture();
   SDL_Surface* getTextureSurface();

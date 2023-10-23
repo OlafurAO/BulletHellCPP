@@ -54,21 +54,6 @@ void Game::gameLoop() {
   enemy->playAnimation(AnimationType::IDLE1);
 
   _characters.push_back(_player);
-
-  /////////////////////////////////////////////
-  /////////////////////////////////////////////
-  Enemy* enemy2 = new Enemy(GameObjectType::ENEMY, 4000.f, 2500.f, 0.5f, 0.1f);
-  const char* textureKey3 = "skeleton";
-  Texture2D& skeletonTex = _windowManager->initTexture("res/sprites/characters/skeleton.png", textureKey3, TextureType::SPRITESHEET, 5, 6);
-  enemy2->registerTexture(textureKey3, skeletonTex, _windowManager->getRenderer(), 2);
-
-  enemy2->initAnimator();
-  enemy2->registerAnimation(AnimationType::IDLE1, new int[5]{0, 1, 2, 3, 4}, 5, true);
-  enemy2->playAnimation(AnimationType::IDLE1);
-  _characters.push_back(enemy2);
-  /////////////////////////////////////////////
-  /////////////////////////////////////////////
-
   _characters.push_back(enemy);
 
   if (_eventManager->getJoystickCount() > 0) {
@@ -130,7 +115,7 @@ void Game::updateGameObjects(double deltaTime) {
       }
     }
 
-    character->update();
+    character->update(deltaTime);
 
     GameObject* obj = dynamic_cast<GameObject*>(character);
     if (obj != nullptr) {
