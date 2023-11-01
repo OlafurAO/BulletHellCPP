@@ -13,7 +13,11 @@ GameObject::GameObject(GameObjectType objectType, float scale, float speed) {
   initSpeed(speed);
 }
 
-GameObject::~GameObject() { delete _hitbox; }
+GameObject::~GameObject() {
+  delete _hitbox;
+  if (_animator != nullptr)
+    delete _animator;
+}
 
 void GameObject::init(GameObjectType objectType) {
   _animator = nullptr;
@@ -31,6 +35,7 @@ void GameObject::initSpeed(float speed) { _speed = speed; }
 void GameObject::initAnimator() { _animator = new Animator(); }
 
 void GameObject::initHitbox(SDL_Renderer* renderer, Texture2D& tex, unsigned int referenceFrameIndex) {
+  // TODO: Refactor this mess
   SDL_Rect srcRect = tex.getSpriteFrame(referenceFrameIndex);
   SDL_FRect destRect = getPositionRect();
   _texFrameSize = tex.getFrameSize();
@@ -93,7 +98,6 @@ void GameObject::updateMovement(double deltaTime) {
 void GameObject::setMovementVectorX(int direction) {
   if (_movementVector.x != direction) {
     _movementVector = glm::vec3(1.f * direction, _movementVector.y, 0.f);
-    updateDirectionOnMoveX(direction);
   }
 }
 
@@ -106,14 +110,6 @@ void GameObject::setMovementVectorY(int direction) {
 void GameObject::updatePrevMovementVector() {
   if (_movementVector != glm::vec3(0.f) && _prevMovementVector != _movementVector) {
     _prevMovementVector = _movementVector;
-  }
-}
-
-void GameObject::updateDirectionOnMoveX(int direction) {
-  if (direction > 0) {
-    _direction = 1;
-  } else if (direction < 0) {
-    _direction = -1.f;
   }
 }
 
@@ -131,9 +127,12 @@ void GameObject::playAnimation(AnimationType type) { _animator->playAnimation(ty
 void GameObject::setCanMove(bool canMove) { _canMove = canMove; }
 
 void GameObject::setPosition(glm::vec3 newPos) {
-  _position = newPos;
-  updateHitboxPos(newPos);
+  glm::vec3 pos = glm::vec3(newPos.x - _hitbox->getWidth() / 2, newPos.y - _hitbox->getHeight() / 2, 0.f);
+  updateHitboxPos(pos);
+  _position = pos;
 }
+
+void GameObject::setZRotation(double angle) { _zRotation = angle; }
 
 Hitbox* GameObject::getHitbox() { return _hitbox; }
 
@@ -156,7 +155,14 @@ SDL_FRect GameObject::getPositionRect() {
 
 glm::vec3 GameObject::getPositionVec() { return _position; }
 
+glm::vec2 GameObject::getHitboxCenterPoint() {
+  SDL_FRect bounds = getHitboxBounds();
+  return glm::vec2(bounds.x + bounds.w / 2.f, bounds.y + bounds.h / 2.f);
+}
+
 int GameObject::getDirection() { return _direction; }
+
+double GameObject::getZRotation() { return _zRotation; }
 
 GameObjectType GameObject::getObjectType() { return _objectType; }
 

@@ -13,6 +13,14 @@ SDL_FRect Hitbox::getHitboxBounds() const {
   return {_position.x + _dimensions.x, _position.y + _dimensions.y, _dimensions.w, _dimensions.h};
 }
 
+float Hitbox::getX() { return _position.x + _dimensions.x; }
+
+float Hitbox::getY() { return _position.y + _dimensions.y; }
+
+float Hitbox::getWidth() { return _dimensions.w; }
+
+float Hitbox::getHeight() { return _dimensions.h; }
+
 bool Hitbox::operator==(const Hitbox& other) const {
   SDL_FRect thisBounds = this->getHitboxBounds();
   SDL_FRect otherBounds = other.getHitboxBounds();

@@ -60,18 +60,28 @@ void Joystick::handleAxisInput(SDL_JoyAxisEvent jaxis) {
   // R-Analog stick: X-axis
   if (jaxis.axis == 2) {
     if (jaxis.value < -_JOYSTICK_DEAD_ZONE) {
-      std::cout << "R-xDir LEFT" << std::endl;
+      registerJoystickEvent(JoystickInput::R_XL, InputState::PRESSED);
+      registerJoystickEvent(JoystickInput::R_XR, InputState::RELEASED);
     } else if (jaxis.value > _JOYSTICK_DEAD_ZONE) {
-      std::cout << "R-xDir RIGHT" << std::endl;
+      registerJoystickEvent(JoystickInput::R_XR, InputState::PRESSED);
+      registerJoystickEvent(JoystickInput::R_XL, InputState::RELEASED);
+    } else {
+      registerJoystickEvent(JoystickInput::R_XL, InputState::RELEASED);
+      registerJoystickEvent(JoystickInput::R_XR, InputState::RELEASED);
     }
   }
 
   // R-Analog stick: Y-axis
   if (jaxis.axis == 3) {
     if (jaxis.value < -_JOYSTICK_DEAD_ZONE) {
-      std::cout << "R-yDir UP" << std::endl;
+      registerJoystickEvent(JoystickInput::R_YU, InputState::PRESSED);
+      registerJoystickEvent(JoystickInput::R_YD, InputState::RELEASED);
     } else if (jaxis.value > _JOYSTICK_DEAD_ZONE) {
-      std::cout << "R-yDir DOWN" << std::endl;
+      registerJoystickEvent(JoystickInput::R_YD, InputState::PRESSED);
+      registerJoystickEvent(JoystickInput::R_YU, InputState::RELEASED);
+    } else {
+      registerJoystickEvent(JoystickInput::R_YU, InputState::RELEASED);
+      registerJoystickEvent(JoystickInput::R_YD, InputState::RELEASED);
     }
   }
 

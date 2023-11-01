@@ -10,4 +10,6 @@ public:
   ~Player();
 
   void update();
+
+  void updateJoystickCrosshair(glm::vec2 movementVector);
 };

@@ -1,9 +1,15 @@
 #include <Character.h>
-#include <headers/Character.h>
+
+Character::~Character() { delete _equippedWeapon; }
 
 void Character::update(float deltaTime) {
-  if (_animator == nullptr) {
+  if (_animator == nullptr)
     return;
+
+  if (_movementVector != glm::vec3(0.f)) {
+    _isMoving = true;
+  } else {
+    _isMoving = false;
   }
 
   updateTakeDamage(deltaTime);
@@ -18,15 +24,14 @@ void Character::update(float deltaTime) {
 }
 
 void Character::updateDirection() {
-  if (_movementVector != glm::vec3(0.f)) {
-    _isMoving = true;
-    if (_movementVector.x > 0) {
-      _characterDirection = CharacterDirection::RIGHT;
-    } else if (_movementVector.x < 0) {
-      _characterDirection = CharacterDirection::LEFT;
-    }
-  } else {
-    _isMoving = false;
+  glm::vec2 crosshairPos = _crosshair.getPositionVec();
+  glm::vec2 center = getHitboxCenterPoint();
+  if (crosshairPos.x < center.x) {
+    _characterDirection = CharacterDirection::LEFT;
+    _direction = -1;
+  } else if (crosshairPos.x > center.x) {
+    _direction = 1;
+    _characterDirection = CharacterDirection::RIGHT;
   }
 }
 
@@ -53,8 +58,10 @@ void Character::updateTakeDamage(float deltaTime) {
 
 void Character::updateEquippedWeapon() {
   if (_equippedWeapon != nullptr) {
+    glm::vec2 centerPoint = getHitboxCenterPoint();
     _equippedWeapon->setDirection(_characterDirection == CharacterDirection::RIGHT ? 1 : -1);
-    _equippedWeapon->setPosition(_position - glm::vec3(10.f, -20.f, 0.f) + ((g_BASE_SPRITE_SIZE * _scale.x) / 2));
+    _equippedWeapon->setPosition(glm::vec3(centerPoint.x, centerPoint.y + 10.f, 0.f));
+    _equippedWeapon->followCrosshair(_crosshair.getPositionVec());
   }
 }
 
@@ -77,6 +84,8 @@ void Character::attack() {
   _animator->playAnimation(AnimationType::ATTACK1);
 }
 
+void Character::updateCrosshair(int x, int y) { _crosshair.updatePosition(x, y); }
+
 void Character::takeDamage(int damage) {
   _damageCooldown = g_DAMAGE_COOLDOWN;
   _isTakingDamage = true;
@@ -87,6 +96,11 @@ void Character::takeDamage(int damage) {
 void Character::equipWeapon(Weapon* weapon) { _equippedWeapon = weapon; }
 
 GameObject* Character::getEquippedWeapon() { return _equippedWeapon; }
+
+SDL_Rect Character::getCrosshairPosition() {
+  glm::vec2 pos = _crosshair.getPositionVec();
+  return {int(pos.x) - 5, int(pos.y) - 5, 10, 10};
+}
 
 int Character::getHealth() { return _health; }
 

@@ -18,6 +18,8 @@ void WindowManager::init(const char* title, int wPosX, int wPosY, int windowW, i
   _window = SDL_CreateWindow(title, wPosX, wPosY, windowW, windowH, flags);
   _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
   SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
+  SDL_GetWindowSize(_window, &_screenWidth, &_screenHeight);
+  SDL_ShowCursor(SDL_DISABLE);
 }
 
 void WindowManager::renderScreen() {
@@ -27,11 +29,18 @@ void WindowManager::renderScreen() {
 
 void WindowManager::renderGameObjects(std::vector<Character*> characters, std::vector<Item*> items) {
   for (const auto& character : characters) {
-    drawGameObject(character);
+    drawGameObject(character, 0, character->getDirection() < 0 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 
     GameObject* equippedWeapon = character->getEquippedWeapon();
     if (equippedWeapon != nullptr) {
-      drawGameObject(equippedWeapon);
+      drawGameObject(equippedWeapon, equippedWeapon->getZRotation(),
+                     equippedWeapon->getDirection() < 0 ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
+    }
+
+    if (character->getObjectType() == GameObjectType::PLAYER) {
+      SDL_Rect crosshair = character->getCrosshairPosition();
+      SDL_SetRenderDrawColor(_renderer, 0, 0, 255, 255);
+      SDL_RenderFillRect(_renderer, &crosshair);
     }
   }
 
@@ -40,8 +49,8 @@ void WindowManager::renderGameObjects(std::vector<Character*> characters, std::v
   }
 }
 
-void WindowManager::renderTexture(SDL_Texture* texture, SDL_Rect srcRect, SDL_FRect destRect, int direction) {
-  SDL_RenderCopyExF(_renderer, texture, &srcRect, &destRect, 0.f, nullptr, direction > 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+void WindowManager::renderTexture(SDL_Texture* texture, SDL_Rect srcRect, SDL_FRect destRect, double angle, SDL_RendererFlip flip) {
+  SDL_RenderCopyExF(_renderer, texture, &srcRect, &destRect, angle, nullptr, flip);
 }
 
 void WindowManager::renderDebugProps(std::vector<Joystick*> joysticks) {
@@ -53,7 +62,7 @@ void WindowManager::renderDebugProps(std::vector<Joystick*> joysticks) {
   }
 }
 
-void WindowManager::drawGameObject(GameObject* obj, SDL_Color color) {
+void WindowManager::drawGameObject(GameObject* obj, double angle, SDL_RendererFlip flip) {
   Texture2D& objTexture = _resourceManager->getTexture(obj->getTextureKey());
   SDL_Rect spriteFrame = objTexture.getSpriteFrame(obj->getSpriteIndex());
   SDL_FRect objPos = obj->getPositionRect();
@@ -65,7 +74,7 @@ void WindowManager::drawGameObject(GameObject* obj, SDL_Color color) {
   if (setColor)
     SDL_SetTextureColorMod(tex, objColor.r, objColor.g, objColor.b);
 
-  renderTexture(tex, spriteFrame, objPos, obj->getDirection());
+  renderTexture(tex, spriteFrame, objPos, angle, flip);
 
   if (setColor)
     SDL_SetTextureColorMod(tex, g_DEFAULT_COLOR.r, g_DEFAULT_COLOR.g, g_DEFAULT_COLOR.b);
@@ -79,6 +88,8 @@ void WindowManager::drawGameObject(GameObject* obj, SDL_Color color) {
 void WindowManager::presentScreen() { SDL_RenderPresent(_renderer); }
 
 SDL_Renderer* WindowManager::getRenderer() { return _renderer; }
+
+std::pair<int, int> WindowManager::getScreenSize() { return std::pair<int, int>(_screenHeight, _screenWidth); }
 
 Texture2D& WindowManager::initTexture(const char* imgPath, const char* texKey, TextureType texType, int spriteRows, int spriteCols) {
   return _resourceManager->loadTexture(_renderer, imgPath, texKey, texType, spriteRows, spriteCols);

@@ -26,15 +26,19 @@ public:
   virtual void registerAnimation(AnimationType type, int* spriteIndices, unsigned int frameCount, bool loop);
   virtual void playAnimation(AnimationType type);
   virtual void setPosition(glm::vec3 newPos);
+  virtual void setZRotation(double angle);
 
   virtual Hitbox* getHitbox();
   virtual SDL_FRect getHitboxBounds();
+  virtual glm::vec2 getHitboxCenterPoint();
+
   virtual SDL_Color getColor();
 
   virtual SDL_FRect getPositionRect();
   virtual glm::vec3 getPositionVec();
 
   virtual int getDirection();
+  virtual double getZRotation();
 
   virtual const char* getTextureKey();
   virtual unsigned int getSpriteIndex();
@@ -70,7 +74,6 @@ private:
 
   void updateMovement(double deltaTime);
   void updatePrevMovementVector();
-  void updateDirectionOnMoveX(int direction);
 
   GameObjectType _objectType;
 

@@ -8,7 +8,7 @@ void Enemy::update(Player* player, float deltaTime) {
 
 void Enemy::checkPlayerCollision(Player* player) {
   // TODO: Ignore if enemy attack method involves it avoiding the player
-  // TODO: Ignore it enemy is outside of a certain range
+  // TODO: Ignore if enemy is outside of a certain range
 
   if (!player->isTakingDamage() && isColliding(player->getHitbox())) {
     player->takeDamage(_damage);
@@ -36,23 +36,15 @@ void Enemy::updatePlayerChase(Player* player, float deltaTime) {
   if (!_canMove)
     return;
 
-  glm::vec3 playerPosition = player->getPositionVec();
-  float posThreshold = 0.025f;
-  if (playerPosition.x < _position.x - posThreshold) {
-    setMovementVectorX(-1);
-  } else if (playerPosition.x > _position.x + posThreshold) {
-    setMovementVectorX(1);
-  } else {
-    setMovementVectorX(0);
-  }
+  glm::vec2 playerCenter = player->getHitboxCenterPoint();
+  glm::vec2 enemyCenter = this->getHitboxCenterPoint();
+  glm::vec2 direction = glm::normalize(playerCenter - enemyCenter);
 
-  if (playerPosition.y < _position.y - posThreshold) {
-    setMovementVectorY(-1);
-  } else if (playerPosition.y > _position.y + posThreshold) {
-    setMovementVectorY(1);
-  } else {
-    setMovementVectorY(0);
-  }
+  int directionX = (playerCenter.x > enemyCenter.x) ? 1 : (playerCenter.x < enemyCenter.x) ? -1 : 0;
+  int directionY = (playerCenter.y > enemyCenter.y) ? 1 : (playerCenter.y < enemyCenter.y) ? -1 : 0;
+  setMovementVectorX(directionX);
+  setMovementVectorY(directionY);
+  updateCrosshair(playerCenter.x, playerCenter.y);
 }
 
 void Enemy::resetChaseCooldown() {

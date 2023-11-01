@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include <glm/glm.hpp>
 #include <sdl2/SDL.h>
 
 #include <Enums.h>
@@ -11,7 +12,7 @@
 
 class EventManager {
 public:
-  EventManager();
+  EventManager(int screenWidth, int screenHeight);
   ~EventManager();
 
   void initJoysticks(const char* xboxTexKey, const char* psTexKey, const char* switchTexKey);
@@ -30,6 +31,8 @@ private:
   void processJoystickEvents(Player* player);
 
   void registerKeyEvent(SDL_Keycode keyCode, InputState keyState);
+  void registerMouseButtonEvent(Uint8 buttonCode, InputState buttonState);
+  void registerMouseMotionEvent(int x, int y);
 
   const int _MAX_CONTROLLER_COUNT = 4;
 
@@ -47,5 +50,19 @@ private:
     {SDLK_s, InputState::RELEASED},
     {SDLK_k, InputState::RELEASED}
   };
+
+  std::unordered_map<Uint8, InputState> _mouseButtonStates = {
+    {SDL_BUTTON_LEFT,   InputState::RELEASED},
+    {SDL_BUTTON_RIGHT,  InputState::RELEASED},
+    {SDL_BUTTON_MIDDLE, InputState::RELEASED},
+    
+    // TODO: handle scroll
+    //{SCROLL_UP,           InputState::RELEASED},
+    //{SCROLL_DOWN,         InputState::RELEASED},
+  };
+
+
+
+  glm::vec2 _mousePosition;
   // clang-format on
 };

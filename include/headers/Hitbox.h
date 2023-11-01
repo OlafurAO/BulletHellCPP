@@ -14,12 +14,17 @@ public:
 
   SDL_FRect getHitboxBounds() const;
 
+  float getX();
+  float getY();
+  float getWidth();
+  float getHeight();
+
   bool operator==(const Hitbox& other) const;
 
   // For debug purposes
   friend std::ostream& operator<<(std::ostream& out, const Hitbox& hitbox) {
     SDL_FRect bounds = hitbox.getHitboxBounds();
-    out << "(X:" << bounds.x << ", Y:" << bounds.y << ", W:" << bounds.w << ", H:" << bounds.h << ")" << std::endl;
+    out << "(X:" << bounds.x << ", Y:" << bounds.y << ", W:" << bounds.w << ", H:" << bounds.h << ")";
     return out;
   };
 

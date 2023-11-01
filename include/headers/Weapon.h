@@ -1,6 +1,8 @@
 #pragma once
 
 #include <GameObject.h>
+#include <glm/glm.hpp>
+#include <math.h>
 
 class Weapon : public GameObject {
 public:
@@ -9,6 +11,7 @@ public:
   ~Weapon(){};
 
   void setDirection(int direction);
+  void followCrosshair(glm::vec2 crosshairPos);
 
 private:
 };

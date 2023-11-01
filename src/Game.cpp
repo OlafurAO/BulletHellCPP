@@ -26,8 +26,8 @@ void Game::init(const char* title, int wPosX, int wPosY, int windowW, int window
 void Game::run() { gameLoop(); }
 
 void Game::gameLoop() {
-  // TODO: set key inputs, set callbacks
-  _eventManager = new EventManager();
+  std::pair<int, int> windowSize = _windowManager->getScreenSize();
+  _eventManager = new EventManager(windowSize.first, windowSize.second);
 
   //////////////////////////////////////////////////////////////
   _player = new Player(GameObjectType::PLAYER, 1.f, 0.2f);

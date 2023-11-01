@@ -24,20 +24,22 @@ public:
 
   void renderGameObjects(std::vector<Character*> characters, std::vector<Item*> items);
   void renderDebugProps(std::vector<Joystick*> joysticks);
-  void renderTexture(SDL_Texture* texture, SDL_Rect srcRect, SDL_FRect destRect, int direction);
+  void renderTexture(SDL_Texture* texture, SDL_Rect srcRect, SDL_FRect destRect, double angle = 0, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
-  void drawGameObject(GameObject* obj, SDL_Color color = {255, 255, 255});
+  void drawGameObject(GameObject* obj, double angle = 0, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
   void cleanUp();
 
-  SDL_Renderer* getRenderer();
   Texture2D& initTexture(const char* imgPath, const char* texKey, TextureType texType, int spriteRows = 0, int spriteCols = 0);
+  SDL_Renderer* getRenderer();
+  std::pair<int, int> getScreenSize();
 
 private:
   SDL_Window* _window;
   SDL_Renderer* _renderer;
-
-  const float _aspectRatio = 16.f / 9.f;
-
   ResourceManager* _resourceManager;
+
+  const float _ASPECT_RATIO = 16.f / 9.f;
+
+  int _screenWidth, _screenHeight;
 };

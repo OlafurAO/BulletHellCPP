@@ -1,8 +1,9 @@
 #include <EventManager.h>
 
-EventManager::EventManager() {
+EventManager::EventManager(int screenWidth, int screenHeight) {
   _lastControllerTypeUsed = ControllerType::KEYBOARD;
   _joysticksDetected = SDL_NumJoysticks();
+  _mousePosition = glm::vec2(screenWidth / 2, screenHeight / 2);
 }
 
 EventManager::~EventManager() {
@@ -45,15 +46,34 @@ void EventManager::pollEvents(GameState& gameState, Player*& player) {
 
 void EventManager::pollKeyboardEvents(SDL_Event event) {
   SDL_Keycode keyCode;
-  if (event.type == SDL_KEYDOWN) {
+  bool foundKeyboardEvent = false;
+
+  switch (event.type) {
+  case SDL_KEYDOWN:
     registerKeyEvent(event.key.keysym.sym, InputState::PRESSED);
-
-    // TODO: FIX
-    _lastControllerTypeUsed = ControllerType::KEYBOARD;
-  } else if (event.type == SDL_KEYUP) {
+    foundKeyboardEvent = true;
+    break;
+  case SDL_KEYUP:
     registerKeyEvent(event.key.keysym.sym, InputState::RELEASED);
+    foundKeyboardEvent = true;
+    break;
+  case SDL_MOUSEMOTION:
+    registerMouseMotionEvent(event.motion.x, event.motion.y);
+    foundKeyboardEvent = true;
+    break;
+  case SDL_MOUSEBUTTONDOWN:
+    registerMouseButtonEvent(event.button.button, InputState::PRESSED);
+    foundKeyboardEvent = true;
+    break;
+  case SDL_MOUSEBUTTONUP:
+    registerMouseButtonEvent(event.button.button, InputState::RELEASED);
+    foundKeyboardEvent = true;
+    break;
+  default:
+    break;
+  }
 
-    // TODO: FIX
+  if (foundKeyboardEvent) {
     _lastControllerTypeUsed = ControllerType::KEYBOARD;
   }
 }
@@ -62,21 +82,22 @@ void EventManager::pollJoystickEvents(SDL_Event event) {
   if (event.type == SDL_JOYAXISMOTION) {
     _joysticks[event.jaxis.which]->handleAxisInput(event.jaxis);
 
-    // TODO: FIX
     if (_joysticks[event.jaxis.which]->isJoystickActive()) {
       _lastControllerTypeUsed = ControllerType::JOYSTICK;
     }
   }
 
+  bool isJoystickActive = false;
   if (event.type == SDL_JOYBUTTONDOWN) {
     _joysticks[event.jbutton.which]->handleButtonPressInput(event.jbutton);
-
-    // TODO: FIX
-    if (_joysticks[event.jbutton.which]->isJoystickActive()) {
-      _lastControllerTypeUsed = ControllerType::JOYSTICK;
-    }
+    isJoystickActive = _joysticks[event.jbutton.which]->isJoystickActive();
   } else if (event.type == SDL_JOYBUTTONUP) {
     _joysticks[event.jbutton.which]->handleButtonReleaseInput(event.jbutton);
+    isJoystickActive = _joysticks[event.jbutton.which]->isJoystickActive();
+  }
+
+  if (isJoystickActive) {
+    _lastControllerTypeUsed = ControllerType::JOYSTICK;
   }
 }
 
@@ -100,6 +121,14 @@ void EventManager::processKeyboardEvents(Player* player) {
   } else {
     player->setMovementVectorY(0);
   }
+
+  player->updateCrosshair(_mousePosition.x, _mousePosition.y);
+  if (_mouseButtonStates[SDL_BUTTON_LEFT] == InputState::PRESSED) {
+    player->attack();
+  } /*else if (_mouseButtonStates[SDL_BUTTON_RIGHT] == InputState::PRESSED) {
+  }
+  if (_mouseButtonStates[SDL_BUTTON_LEFT] == InputState::PRESSED) {
+  }*/
 }
 
 void EventManager::processJoystickEvents(Player* player) {
@@ -107,7 +136,24 @@ void EventManager::processJoystickEvents(Player* player) {
     player->attack();
   }
 
-  // TODO: check all joysticks
+  glm::vec2 crossHairVelocity = glm::vec2(0);
+
+  // calculate angle??
+  if (_joysticks[0]->isAxisInputPressed(JoystickInput::R_XL)) {
+    crossHairVelocity -= glm::vec2(1.f, 0);
+  } else if (_joysticks[0]->isAxisInputPressed(JoystickInput::R_XR)) {
+    crossHairVelocity += glm::vec2(1.f, 0);
+  }
+
+  if (_joysticks[0]->isAxisInputPressed(JoystickInput::R_YU)) {
+    crossHairVelocity -= glm::vec2(0, 1.f);
+  } else if (_joysticks[0]->isAxisInputPressed(JoystickInput::R_YD)) {
+    crossHairVelocity += glm::vec2(0, 1.f);
+  }
+
+  player->updateJoystickCrosshair(crossHairVelocity);
+
+  // TODO: check all connected joysticks
   if (_joysticks[0]->isAxisInputPressed(JoystickInput::L_XL)) {
     player->setMovementVectorX(-1);
   } else if (_joysticks[0]->isAxisInputPressed(JoystickInput::L_XR)) {
@@ -130,6 +176,14 @@ void EventManager::registerKeyEvent(SDL_Keycode keyCode, InputState keyState) {
     _keyStates[keyCode] = keyState;
   }
 }
+
+void EventManager::registerMouseButtonEvent(Uint8 buttonCode, InputState buttonState) {
+  if (_mouseButtonStates.find(buttonCode) != _mouseButtonStates.end()) {
+    _mouseButtonStates[buttonCode] = buttonState;
+  }
+}
+
+void EventManager::registerMouseMotionEvent(int x, int y) { _mousePosition = glm::vec2(x, y); }
 
 std::vector<Joystick*> EventManager::getJoysticks() { return _joysticks; }
 
