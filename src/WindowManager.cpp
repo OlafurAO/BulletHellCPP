@@ -6,9 +6,9 @@ bool operator==(const SDL_Color& color1, const SDL_Color& color2) {
 
 bool operator!=(const SDL_Color& color1, const SDL_Color& color2) { return !(color1 == color2); }
 
-WindowManager::WindowManager() {
+WindowManager::WindowManager(ResourceManager* resourceManager) {
+  _resourceManager = resourceManager;
   _window = nullptr;
-  _resourceManager = new ResourceManager();
 }
 
 WindowManager::~WindowManager() {}
@@ -27,25 +27,21 @@ void WindowManager::renderScreen() {
   SDL_RenderClear(_renderer);
 }
 
-void WindowManager::renderGameObjects(std::vector<Character*> characters, std::vector<Item*> items) {
-  for (const auto& character : characters) {
-    drawGameObject(character, 0, character->getDirection() < 0 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+void WindowManager::renderGameObjects(std::vector<GameObject*> objs) {
+  for (const auto& obj : objs) {
+    GameObjectType type = obj->getObjectType();
+    SDL_RendererFlip flip =
+        obj->getDirection() < 0 ? type == GameObjectType::WEAPON ? SDL_FLIP_VERTICAL : SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 
-    GameObject* equippedWeapon = character->getEquippedWeapon();
-    if (equippedWeapon != nullptr) {
-      drawGameObject(equippedWeapon, equippedWeapon->getZRotation(),
-                     equippedWeapon->getDirection() < 0 ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
-    }
+    drawGameObject(obj, obj->getZRotation(), flip);
 
-    if (character->getObjectType() == GameObjectType::PLAYER) {
-      SDL_Rect crosshair = character->getCrosshairPosition();
+    if (type == GameObjectType::PLAYER) {
+      Character* player = dynamic_cast<Character*>(obj);
+      SDL_Rect crosshair = player->getCrosshairPosition();
+
       SDL_SetRenderDrawColor(_renderer, 0, 0, 255, 255);
       SDL_RenderFillRect(_renderer, &crosshair);
     }
-  }
-
-  for (const auto& item : items) {
-    drawGameObject(item);
   }
 }
 
@@ -90,10 +86,6 @@ void WindowManager::presentScreen() { SDL_RenderPresent(_renderer); }
 SDL_Renderer* WindowManager::getRenderer() { return _renderer; }
 
 std::pair<int, int> WindowManager::getScreenSize() { return std::pair<int, int>(_screenHeight, _screenWidth); }
-
-Texture2D& WindowManager::initTexture(const char* imgPath, const char* texKey, TextureType texType, int spriteRows, int spriteCols) {
-  return _resourceManager->loadTexture(_renderer, imgPath, texKey, texType, spriteRows, spriteCols);
-}
 
 void WindowManager::cleanUp() {
   SDL_DestroyWindow(_window);

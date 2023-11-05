@@ -24,15 +24,17 @@ void GameObject::init(GameObjectType objectType) {
   _objectType = objectType;
   _canMove = true;
 
-  _movementVector = glm::vec3(0.f);
-  _position = glm::vec3(0.f);
+  _movementVector = glm::vec2(0.f);
+  _position = glm::vec2(0.f);
 }
 
-void GameObject::initScale(float scale) { _scale = glm::vec3(scale); }
+void GameObject::initScale(float scale) { _scale = glm::vec2(scale); }
 
 void GameObject::initSpeed(float speed) { _speed = speed; }
 
 void GameObject::initAnimator() { _animator = new Animator(); }
+
+void GameObject::initAudioManager(AudioManager* audioManager) { _audioManager = audioManager; }
 
 void GameObject::initHitbox(SDL_Renderer* renderer, Texture2D& tex, unsigned int referenceFrameIndex) {
   // TODO: Refactor this mess
@@ -77,19 +79,16 @@ void GameObject::initHitbox(SDL_Renderer* renderer, Texture2D& tex, unsigned int
   tex.destroyTextureSurface();
 }
 
-void GameObject::updateHitboxPos(glm::vec3 newPos) { _hitbox->updatePosition(newPos); }
+void GameObject::updateHitboxPos(glm::vec2 newPos) { _hitbox->updatePosition(newPos); }
 
 void GameObject::update(double deltaTime) {
   updatePrevMovementVector();
   updateMovement(deltaTime);
-
-  if (_animator != nullptr) {
-    _animator->update(deltaTime);
-  }
+  updateAnimator(deltaTime);
 }
 
 void GameObject::updateMovement(double deltaTime) {
-  if (_canMove && _movementVector != glm::vec3(0.f)) {
+  if (_canMove && _movementVector != glm::vec2(0.f)) {
     _position += glm::normalize(_movementVector) * _speed * (float)deltaTime;
     updateHitboxPos(_position);
   }
@@ -97,18 +96,18 @@ void GameObject::updateMovement(double deltaTime) {
 
 void GameObject::setMovementVectorX(int direction) {
   if (_movementVector.x != direction) {
-    _movementVector = glm::vec3(1.f * direction, _movementVector.y, 0.f);
+    _movementVector = glm::vec2(1.f * direction, _movementVector.y);
   }
 }
 
 void GameObject::setMovementVectorY(int direction) {
   if (_movementVector.y != direction) {
-    _movementVector = glm::vec3(_movementVector.x, 1.f * direction, 0.f);
+    _movementVector = glm::vec2(_movementVector.x, 1.f * direction);
   }
 }
 
 void GameObject::updatePrevMovementVector() {
-  if (_movementVector != glm::vec3(0.f) && _prevMovementVector != _movementVector) {
+  if (_movementVector != glm::vec2(0.f) && _prevMovementVector != _movementVector) {
     _prevMovementVector = _movementVector;
   }
 }
@@ -124,10 +123,16 @@ void GameObject::registerAnimation(AnimationType type, int* spriteIndices, unsig
 
 void GameObject::playAnimation(AnimationType type) { _animator->playAnimation(type); }
 
+void GameObject::updateAnimator(double deltaTime) {
+  if (_animator != nullptr) {
+    _animator->update(deltaTime);
+  }
+}
+
 void GameObject::setCanMove(bool canMove) { _canMove = canMove; }
 
-void GameObject::setPosition(glm::vec3 newPos) {
-  glm::vec3 pos = glm::vec3(newPos.x - _hitbox->getWidth() / 2, newPos.y - _hitbox->getHeight() / 2, 0.f);
+void GameObject::setPosition(glm::vec2 newPos) {
+  glm::vec2 pos = glm::vec2(newPos.x - _hitbox->getWidth() / 2, newPos.y - _hitbox->getHeight() / 2);
   updateHitboxPos(pos);
   _position = pos;
 }
@@ -153,7 +158,7 @@ SDL_FRect GameObject::getPositionRect() {
   return rect;
 }
 
-glm::vec3 GameObject::getPositionVec() { return _position; }
+glm::vec2 GameObject::getPositionVec() { return _position; }
 
 glm::vec2 GameObject::getHitboxCenterPoint() {
   SDL_FRect bounds = getHitboxBounds();

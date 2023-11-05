@@ -7,10 +7,10 @@
 
 class Hitbox {
 public:
-  Hitbox(glm::vec3 pos, SDL_FRect dimensions);
+  Hitbox(glm::vec2 pos, SDL_FRect dimensions);
   ~Hitbox();
 
-  void updatePosition(glm::vec3 newPos);
+  void updatePosition(glm::vec2 newPos);
 
   SDL_FRect getHitboxBounds() const;
 
@@ -29,6 +29,6 @@ public:
   };
 
 private:
-  glm::vec3 _position;
+  glm::vec2 _position;
   SDL_FRect _dimensions;
 };

@@ -7,12 +7,15 @@
 
 #include <sdl2/SDL.h>
 
+#include <AudioManager.h>
 #include <Character.h>
 #include <Enemy.h>
+#include <EntityManager.h>
 #include <Enums.h>
 #include <EventManager.h>
 #include <GameObject.h>
 #include <Item.h>
+#include <Path.h>
 #include <Player.h>
 #include <Texture2D.h>
 #include <WindowManager.h>
@@ -27,16 +30,14 @@ public:
 
 private:
   void gameLoop();
-  void updateGameObjects(double deltaTime);
 
   double getDeltaTime(std::chrono::_V2::system_clock::time_point startTime, double& timer);
 
   WindowManager* _windowManager;
+  ResourceManager* _resourceManager;
+  AudioManager* _audioManager;
   EventManager* _eventManager;
-  Player* _player;
-
-  std::vector<Character*> _characters;
-  std::vector<Item*> _items;
+  EntityManager* _entityManager;
 
   GameState _gameState;
 

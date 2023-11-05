@@ -4,13 +4,16 @@
 enum GameState { PLAY, EXIT };
 enum InputState { RELEASED, PRESSED };
 enum ControllerType { KEYBOARD, JOYSTICK };
-enum GameObjectType { PLAYER, ENEMY, ITEM, WEAPON };
+enum GameObjectType { PLAYER, ENEMY, ITEM, WEAPON, PROJECTILE };
 enum CharacterDirection { UP, DOWN, LEFT, RIGHT };
 enum WeaponType { MELEE, RANGED };
 enum TextureType { SPRITE, SPRITESHEET };
 enum AnimationType { NONE, IDLE1, IDLE2, IDLE3, IDLE4, WALK1, WALK2, WALK3, WALK4, ATTACK1, ATTACK2, ATTACK3, ATTACK4 };
 
 // clang-format off
+
+// enum MouseButton { LEFT_MOUSE_BUTTON, RIGHT_MOUSE_BUTTON, MIDDLE_MOUSE_BUTTON, SCROLL_UP, SCROLL_DOWN };
+
 enum JoystickType { PLAYSTATION, SWITCH, XBOX };
 enum JoystickInput {
   // Face buttons

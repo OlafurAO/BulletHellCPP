@@ -1,13 +1,13 @@
-#include "Hitbox.h"
+#include <Hitbox.h>
 
-Hitbox::Hitbox(glm::vec3 pos, SDL_FRect dimensions) {
+Hitbox::Hitbox(glm::vec2 pos, SDL_FRect dimensions) {
   _dimensions = dimensions;
   _position = pos;
 }
 
 Hitbox::~Hitbox() {}
 
-void Hitbox::updatePosition(glm::vec3 newPos) { _position = newPos; }
+void Hitbox::updatePosition(glm::vec2 newPos) { _position = newPos; }
 
 SDL_FRect Hitbox::getHitboxBounds() const {
   return {_position.x + _dimensions.x, _position.y + _dimensions.y, _dimensions.w, _dimensions.h};

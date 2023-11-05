@@ -6,11 +6,13 @@ void Character::update(float deltaTime) {
   if (_animator == nullptr)
     return;
 
-  if (_movementVector != glm::vec3(0.f)) {
+  if (_movementVector != glm::vec2(0.f)) {
     _isMoving = true;
   } else {
     _isMoving = false;
   }
+
+  // TODO: add collision check with projectiles
 
   updateTakeDamage(deltaTime);
 
@@ -21,6 +23,11 @@ void Character::update(float deltaTime) {
   } else {
     checkAttackAnimation();
   }
+}
+
+void Character::checkProjectileCollision(std::vector<Projectile*> projectiles) {
+  // ALKSALAJHDSSDAS
+  //  AOISD POIASJOIJASD
 }
 
 void Character::updateDirection() {
@@ -60,7 +67,7 @@ void Character::updateEquippedWeapon() {
   if (_equippedWeapon != nullptr) {
     glm::vec2 centerPoint = getHitboxCenterPoint();
     _equippedWeapon->setDirection(_characterDirection == CharacterDirection::RIGHT ? 1 : -1);
-    _equippedWeapon->setPosition(glm::vec3(centerPoint.x, centerPoint.y + 10.f, 0.f));
+    _equippedWeapon->setPosition(glm::vec2(centerPoint.x, centerPoint.y + 10.f));
     _equippedWeapon->followCrosshair(_crosshair.getPositionVec());
   }
 }
@@ -70,7 +77,6 @@ void Character::updateDamageCooldown(float deltaTime) { _damageCooldown -= delta
 void Character::checkAttackAnimation() {
   if (!_animator->isPlayingAnimation()) {
     _animator->playAnimation(_animator->getPrevAnimation());
-    setCanMove(true);
     _isAttacking = false;
   }
 }
@@ -79,14 +85,16 @@ void Character::attack() {
   if (_isAttacking)
     return;
 
-  setCanMove(false);
-  _isAttacking = true;
-  _animator->playAnimation(AnimationType::ATTACK1);
+  // TODO: CHECK IF HAS ATTACK ANIMATION
+  _equippedWeapon->fireWeapon(_crosshair.getPositionVec());
+  //_isAttacking = true;
+  //_animator->playAnimation(AnimationType::ATTACK1);
 }
 
 void Character::updateCrosshair(int x, int y) { _crosshair.updatePosition(x, y); }
 
 void Character::takeDamage(int damage) {
+  _audioManager->playSfx(_objectType == GameObjectType::PLAYER ? SFX::DAMAGE_PLAYER_01 : SFX::DAMAGE_ENEMY_01);
   _damageCooldown = g_DAMAGE_COOLDOWN;
   _isTakingDamage = true;
   _damage -= damage;
@@ -95,7 +103,7 @@ void Character::takeDamage(int damage) {
 
 void Character::equipWeapon(Weapon* weapon) { _equippedWeapon = weapon; }
 
-GameObject* Character::getEquippedWeapon() { return _equippedWeapon; }
+Weapon* Character::getEquippedWeapon() { return _equippedWeapon; }
 
 SDL_Rect Character::getCrosshairPosition() {
   glm::vec2 pos = _crosshair.getPositionVec();

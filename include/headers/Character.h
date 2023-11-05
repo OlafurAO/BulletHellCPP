@@ -1,11 +1,14 @@
 #pragma once
 
+#include <vector>
+
 #include <sdl2/SDL.h>
 
 #include <Crosshair.h>
 #include <Enums.h>
 #include <GameObject.h>
 #include <Item.h>
+#include <Projectile.h>
 #include <Weapon.h>
 
 class Character : public GameObject {
@@ -16,6 +19,7 @@ public:
   ~Character();
 
   void update(float deltaTime);
+  void checkProjectileCollision(std::vector<Projectile*> projectiles);
   void attack();
 
   void updateCrosshair(int x, int y);
@@ -23,7 +27,7 @@ public:
 
   void equipWeapon(Weapon* weapon);
 
-  GameObject* getEquippedWeapon();
+  Weapon* getEquippedWeapon();
   SDL_Rect getCrosshairPosition();
 
   int getHealth();

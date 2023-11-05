@@ -11,4 +11,4 @@ const float g_DAMAGE_COOLDOWN = 500.f;
 const SDL_Color g_DEFAULT_COLOR = {255, 255, 255};
 const SDL_Color g_RED = {255, 0, 0};
 
-#endif // ENUMS
+#endif // GLOBALS
