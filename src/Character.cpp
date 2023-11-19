@@ -101,7 +101,10 @@ void Character::takeDamage(int damage) {
   _color = g_RED;
 }
 
-void Character::equipWeapon(Weapon* weapon) { _equippedWeapon = weapon; }
+void Character::equipWeapon(Weapon* weapon) {
+  _equippedWeapon = weapon;
+  _equippedWeapon->setPosition(getHitboxCenterPoint());
+}
 
 Weapon* Character::getEquippedWeapon() { return _equippedWeapon; }
 

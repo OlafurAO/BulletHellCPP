@@ -79,6 +79,12 @@ void WindowManager::drawGameObject(GameObject* obj, double angle, SDL_RendererFl
   SDL_FRect hitbox = obj->getHitboxBounds();
   SDL_SetRenderDrawColor(_renderer, 0, 255, 0, 255);
   SDL_RenderDrawRectF(_renderer, &hitbox);
+
+  // Debug
+  glm::vec2 centerPoint = obj->getPositionVec();
+  SDL_FRect a = {centerPoint.x - 2.5, centerPoint.y - 2.5, 5, 5};
+  SDL_SetRenderDrawColor(_renderer, 0, 255, 0, 255);
+  SDL_RenderDrawRectF(_renderer, &a);
 }
 
 void WindowManager::presentScreen() { SDL_RenderPresent(_renderer); }

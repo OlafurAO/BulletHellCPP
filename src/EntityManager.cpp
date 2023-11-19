@@ -17,17 +17,17 @@ void EntityManager::initEntities() {
   //////////////////////////////////////////////////////////////
   // initCharacter(GameObjectType objectType, float scale, float speed, Path texPath, texKey, spriteCols, spriteRows)
 
-  _player = new Player(GameObjectType::PLAYER, 1.f, 0.2f);
+  _player = new Player(GameObjectType::PLAYER, 0.5f, 0.2f);
   _player->initAudioManager(_audioManager);
 
   const char* textureKey = "player";
   Texture2D& playerTex =
-      _resourceManager->loadTexture(Path("player.png", ResType::SPRITE_CHAR), textureKey, TextureType::SPRITESHEET, 10, 6);
+      _resourceManager->loadTexture(Path("player_01.png", ResType::SPRITE_CHAR), textureKey, TextureType::SPRITESHEET, 2, 5);
   _player->registerTexture(textureKey, playerTex, _resourceManager->getRenderer(), 0);
 
   _player->initAnimator();
-  _player->registerAnimation(AnimationType::IDLE1, new int[6]{6, 7, 8, 9, 10, 11}, 6, true);
-  _player->registerAnimation(AnimationType::WALK1, new int[6]{24, 25, 26, 27, 28, 29}, 6, true);
+  _player->registerAnimation(AnimationType::IDLE1, new int[5]{0, 1, 2, 3, 4}, 5, true);
+  _player->registerAnimation(AnimationType::WALK1, new int[3]{5, 6, 7}, 3, true);
 
   _player->playAnimation(AnimationType::IDLE1);
 
@@ -48,11 +48,11 @@ void EntityManager::initEntities() {
   const char* gunsTexKey = "weapons_guns";
   const char* bulletTexKey = "weapons_bullet";
   Texture2D& gunTex =
-      _resourceManager->loadTexture(Path("revolver.png", ResType::SPRITE_WEAPONS), gunsTexKey, TextureType::SPRITESHEET, 1, 1);
+      _resourceManager->loadTexture(Path("pistol_01.png", ResType::SPRITE_WEAPONS), gunsTexKey, TextureType::SPRITESHEET, 1, 1);
   Texture2D& bulletTex =
       _resourceManager->loadTexture(Path("AK47.png", ResType::SPRITE_WEAPONS), bulletTexKey, TextureType::SPRITESHEET, 1, 1);
 
-  Weapon* revolver = new Weapon(GameObjectType::WEAPON, 0.25f);
+  Weapon* revolver = new Weapon(GameObjectType::WEAPON, 0.5f);
   revolver->initBaselineProjectile();
 
   revolver->registerTexture(gunsTexKey, gunTex, _resourceManager->getRenderer(), 0);
